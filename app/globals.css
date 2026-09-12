@@ -1,0 +1,195 @@
+:root{
+  --base: #12151A;
+  --panel: #1B2028;
+  --rail: #2A3038;
+  --signal: #E8A33D;
+  --signal-dim: #7A5A26;
+  --text: #E7E4DD;
+  --muted: #82888F;
+  --done: #4F8F6B;
+  --danger: #C1594A;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--base);
+  color:var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height:100vh;
+}
+.wrap{
+  max-width:640px;
+  margin:0 auto;
+  padding:32px 16px 80px;
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  border-bottom:1px solid var(--rail);
+  padding-bottom:18px;
+  margin-bottom:28px;
+}
+.brand{
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size:34px;
+  letter-spacing:0.5px;
+  font-weight:600;
+  line-height:1;
+}
+.brand span{color:var(--signal);}
+.subtitle{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:6px;
+}
+.totals{
+  font-size:13px;
+  color:var(--muted);
+  text-align:right;
+  font-variant-numeric: tabular-nums;
+}
+.totals strong{ color:var(--signal); font-weight:600; }
+
+.add-row{
+  display:flex;
+  gap:8px;
+  margin-bottom:32px;
+  background:var(--panel);
+  border:1px solid var(--rail);
+  border-radius:10px;
+  padding:10px;
+}
+.add-row input[type="text"]{
+  flex:1;
+  background:var(--base);
+  border:1px solid var(--rail);
+  border-radius:6px;
+  color:var(--text);
+  font-size:15px;
+  padding:9px 12px;
+  min-width:0;
+}
+.duration-stepper{
+  display:flex;
+  align-items:center;
+  background:var(--base);
+  border:1px solid var(--rail);
+  border-radius:6px;
+  flex-shrink:0;
+  overflow:hidden;
+}
+.duration-stepper button{
+  background:none;
+  border:none;
+  color:var(--muted);
+  font-size:16px;
+  width:32px;
+  height:38px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.duration-stepper button:hover{ color:var(--signal); }
+.duration-stepper button:disabled{ opacity:0.3; cursor:default; }
+.duration-value{
+  font-variant-numeric: tabular-nums;
+  font-size:14px;
+  width:64px;
+  text-align:center;
+  color:var(--text);
+  flex-shrink:0;
+}
+.add-row input:focus{
+  outline:none;
+  border-color:var(--signal-dim);
+}
+.add-row button.add-btn{
+  background:var(--signal);
+  border:none;
+  border-radius:6px;
+  color:#241a08;
+  font-weight:600;
+  font-size:14px;
+  padding:0 18px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.add-row button.add-btn:hover{ filter:brightness(1.08); }
+
+.entry{
+  margin-bottom:12px;
+}
+.duration-chip{
+  flex-shrink:0;
+  min-width:56px;
+  text-align:center;
+  font-variant-numeric: tabular-nums;
+  font-size:13px;
+  color:var(--muted);
+  background:var(--base);
+  border:1px solid var(--rail);
+  border-radius:6px;
+  padding:7px 8px;
+}
+.entry.done .duration-chip{
+  color:var(--done);
+  border-color: color-mix(in srgb, var(--done) 55%, var(--rail));
+}
+.card{
+  background:var(--panel);
+  border:1px solid var(--rail);
+  border-radius:10px;
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.entry.done .card{
+  border-color: color-mix(in srgb, var(--done) 40%, var(--rail));
+}
+.card .task{
+  flex:1;
+  font-size:15px;
+  line-height:1.4;
+}
+.entry.done .card .task{
+  color:var(--muted);
+  text-decoration:line-through;
+  text-decoration-color:var(--done);
+}
+.card button{
+  background:none;
+  border:1px solid var(--rail);
+  border-radius:6px;
+  color:var(--muted);
+  font-size:12px;
+  padding:6px 10px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.card button.mark:hover{ border-color:var(--done); color:var(--done); }
+.entry.done .card button.mark{ border-color:var(--done); color:var(--done); }
+.card button.remove:hover{ border-color:var(--danger); color:var(--danger); }
+
+.empty{
+  color:var(--muted);
+  font-size:14px;
+  padding:24px 0;
+}
+
+.status-line{
+  margin-top:24px;
+  padding-top:16px;
+  border-top:1px solid var(--rail);
+  color:var(--muted);
+  font-size:12px;
+  display:flex;
+  justify-content:space-between;
+}
+.status-line .signal-dot{
+  display:inline-block;
+  width:6px; height:6px;
+  border-radius:50%;
+  background:var(--signal);
+  margin-right:6px;
+}
