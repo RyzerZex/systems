@@ -1,0 +1,23 @@
+{
+  "name": "Systems",
+  "short_name": "Systems",
+  "description": "Set the time it takes, run the task.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#12151A",
+  "theme_color": "#12151A",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

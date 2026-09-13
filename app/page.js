@@ -20,8 +20,14 @@ export default function Home() {
   const [task, setTask] = useState('');
   const [duration, setDuration] = useState(30);
 
+  const [notifyMinutes, setNotifyMinutes] = useState(60);
+  const [notifyInput, setNotifyInput] = useState('60');
+  const [pushStatus, setPushStatus] = useState('unsupported'); // unsupported | default | denied | subscribed
+
   useEffect(() => {
     loadEntries();
+    loadSettings();
+    checkPushStatus();
   }, []);
 
   async function loadEntries() {
@@ -33,6 +39,79 @@ export default function Home() {
       console.error('Failed to load systems', e);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadSettings() {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      setNotifyMinutes(data.notifyIntervalMinutes);
+      setNotifyInput(String(data.notifyIntervalMinutes));
+    } catch (e) {
+      console.error('Failed to load settings', e);
+    }
+  }
+
+  async function saveNotifyInterval() {
+    const minutes = Math.max(1, Number(notifyInput) || 60);
+    const res = await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notifyIntervalMinutes: minutes }),
+    });
+    const data = await res.json();
+    setNotifyMinutes(data.notifyIntervalMinutes);
+    setNotifyInput(String(data.notifyIntervalMinutes));
+  }
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
+  }
+
+  async function checkPushStatus() {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+      setPushStatus('unsupported');
+      return;
+    }
+    if (Notification.permission === 'denied') {
+      setPushStatus('denied');
+      return;
+    }
+    const registration = await navigator.serviceWorker.ready;
+    const existing = await registration.pushManager.getSubscription();
+    setPushStatus(existing ? 'subscribed' : 'default');
+  }
+
+  async function enablePush() {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        setPushStatus('denied');
+        return;
+      }
+
+      const keyRes = await fetch('/api/push/public-key');
+      const { publicKey } = await keyRes.json();
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey),
+      });
+
+      await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription }),
+      });
+
+      setPushStatus('subscribed');
+    } catch (e) {
+      console.error('Failed to enable push notifications', e);
     }
   }
 
@@ -88,6 +167,39 @@ export default function Home() {
         </div>
       </header>
 
+      <div className="notify-row">
+        <span className="notify-label">Remind me every</span>
+        <input
+          type="number"
+          min="1"
+          className="notify-input"
+          value={notifyInput}
+          onChange={(e) => setNotifyInput(e.target.value)}
+        />
+        <span className="notify-label">min</span>
+        <button className="notify-save" onClick={saveNotifyInterval}>
+          Save
+        </button>
+        {pushStatus === 'default' && (
+          <button className="notify-enable" onClick={enablePush}>
+            Enable notifications
+          </button>
+        )}
+        {pushStatus === 'denied' && (
+          <span className="notify-status notify-status-denied">
+            Notifications blocked in browser settings
+          </span>
+        )}
+        {pushStatus === 'subscribed' && (
+          <span className="notify-status">Notifications on</span>
+        )}
+        {pushStatus === 'unsupported' && (
+          <span className="notify-status notify-status-denied">
+            Notifications not supported here
+          </span>
+        )}
+      </div>
+
       <div className="add-row">
         <input
           type="text"
@@ -104,7 +216,7 @@ export default function Home() {
             disabled={duration <= MIN_DURATION}
             onClick={() => setDuration((d) => Math.max(MIN_DURATION, d - STEP))}
           >
-            -
+            −
           </button>
           <div className="duration-value">{minutesToLabel(duration)}</div>
           <button
