@@ -104,7 +104,7 @@ export default function Home() {
             disabled={duration <= MIN_DURATION}
             onClick={() => setDuration((d) => Math.max(MIN_DURATION, d - STEP))}
           >
-            &minus;
+            -;
           </button>
           <div className="duration-value">{minutesToLabel(duration)}</div>
           <button
@@ -112,7 +112,7 @@ export default function Home() {
             disabled={duration >= MAX_DURATION}
             onClick={() => setDuration((d) => Math.min(MAX_DURATION, d + STEP))}
           >
-            &plus;
+            +;
           </button>
         </div>
         <button className="add-btn" onClick={addEntry}>
